@@ -6,7 +6,7 @@ class Task(dict):
         self.update(task)
 
     @property
-    def task_status(self):
+    def status(self):
         return self.get('status')
 
     @property
@@ -18,7 +18,7 @@ class Task(dict):
         return self.get('task_name')
 
     @property
-    def task_result(self):
+    def result(self):
         return self.get('result')
 
     @property
@@ -41,15 +41,22 @@ class Task(dict):
     def content(self):
         return self.get('content')
 
+    @property
+    def minion_ip(self):
+        return self.get('minion_ip')
+
 
 class TasksClient(object):
 
     def __init__(self, api):
         self.api = api
 
-    def list(self, wf_id, *args):
-        uri = 'tasks/{workflow_id}'.format(workflow_id=wf_id)
-        result, status = self.api.get(uri, params=args)
+    def list(self, wf_id, **kwargs):
+        assert wf_id
+        uri = 'tasks'
+        params = {'workflow_id': wf_id}
+        params.update(kwargs)
+        result, status = self.api.get(uri, params=params)
         return [Task(item) for item in result], status
 
     def get(self, wf_id, task_id):
