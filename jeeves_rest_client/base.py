@@ -1,7 +1,8 @@
 import base64
 import requests
 
-from rest_client_exceptions import JeevesMasterServerError
+from rest_client_exceptions import (JeevesMasterServerError,
+                                    JeevesClientError)
 
 
 class HttpClient(object):
@@ -80,8 +81,10 @@ class HttpClient(object):
                                params=params,
                                stream=stream,
                                **kwargs)
-        if res.status_code == 500:
-            raise JeevesMasterServerError(res)
+        if res.status_code >= 500:
+            raise JeevesMasterServerError(res, res.status_code)
+        if res.status_code >= 400:
+            raise JeevesClientError(res, res.status_code)
         return res.json(), res.status_code
 
     def _create_url(self, uri, params):
