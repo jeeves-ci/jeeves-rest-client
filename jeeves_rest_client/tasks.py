@@ -46,15 +46,40 @@ class Task(dict):
         return self.get('minion_ip')
 
 
+class Tasks(dict):
+
+    def __init__(self, tasks):
+        super(Tasks, self).__init__()
+        self.update(tasks)
+
+    @property
+    def page(self):
+        return self.get('page')
+
+    @property
+    def size(self):
+        return self.get('size')
+
+    @property
+    def total(self):
+        return self.get('total')
+
+    @property
+    def tasks(self):
+        return [Task(item) for item in self.get('tasks')]
+
+
 class TasksClient(object):
 
     def __init__(self, api):
         self.api = api
 
-    def list(self, wf_id, **kwargs):
+    def list(self, wf_id, page=1, size=100, **kwargs):
         assert wf_id
         uri = 'tasks'
-        params = {'workflow_id': wf_id}
+        params = {'workflow_id': wf_id,
+                  'page': page,
+                  'size': size}
         params.update(kwargs)
         result, status = self.api.get(uri, params=params)
         return [Task(item) for item in result], status

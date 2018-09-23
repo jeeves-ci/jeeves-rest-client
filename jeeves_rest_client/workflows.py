@@ -24,16 +24,40 @@ class Workflow(dict):
         return self.get('ended_at')
 
 
+class Workflows(dict):
+
+    def __init__(self, workflows):
+        # super(Workflow, self).__init__()
+        self.update(workflows)
+
+    @property
+    def page(self):
+        return self.get('page')
+
+    @property
+    def size(self):
+        return self.get('size')
+
+    @property
+    def total(self):
+        return self.get('total')
+
+    @property
+    def workflows(self):
+        return [Workflow(item) for item in self.get('workflows')]
+
+
 class WorkflowsClient(object):
     def __init__(self, api):
         self.api = api
 
-    def list(self, **kwargs):
+    def list(self, page=1, size=10, **kwargs):
         uri = 'workflows'
-        params = {}
+        params = {'page': page,
+                  'size': size}
         params.update(kwargs)
         result, status = self.api.get(uri, params=params)
-        return [Workflow(item) for item in result], status
+        return Workflows(result), status
 
     def get(self, workflow_id, **kwargs):
         assert workflow_id
