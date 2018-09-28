@@ -76,13 +76,12 @@ class TasksClient(object):
 
     def list(self, wf_id, page=1, size=100, **kwargs):
         assert wf_id
-        uri = 'tasks'
-        params = {'workflow_id': wf_id,
-                  'page': page,
+        uri = 'workflow/{}/tasks'.format(wf_id)
+        params = {'page': page,
                   'size': size}
         params.update(kwargs)
         result, status = self.api.get(uri, params=params)
-        return [Task(item) for item in result], status
+        return Tasks(result), status
 
     def get(self, wf_id, task_id):
         pass
