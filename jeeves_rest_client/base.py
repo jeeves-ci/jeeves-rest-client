@@ -1,4 +1,3 @@
-import base64
 import requests
 
 from rest_client_exceptions import (JeevesMasterServerError,
@@ -7,17 +6,9 @@ from rest_client_exceptions import (JeevesMasterServerError,
 
 class HttpClient(object):
 
-    def __init__(self, endpoint_url, username=None, password=None, headers={}):
-        self.headers = self._init_headers(username, password, headers)
+    def __init__(self, endpoint_url, headers={}):
+        self.headers = headers
         self.endpoint_url = endpoint_url
-
-    def _init_headers(self, username, password, headers):
-        if username and password:
-            auth = base64.b64encode('{username}:{password}'
-                                    .format(username=username,
-                                            password=password))
-            headers.update({'Authorization': 'Basic {0}'.format(auth)})
-        return headers
 
     def get(self, uri, params={}, headers={}, **kwargs):
         return self._do_request(method='GET',
@@ -43,6 +34,7 @@ class HttpClient(object):
              data={},
              headers={},
              **kwargs):
+        headers.update({'Content-Type': 'application/json'})
         return self._do_request(method='POST',
                                 uri=uri,
                                 headers=headers,
@@ -76,7 +68,7 @@ class HttpClient(object):
 
         res = requests.request(method=method,
                                url=url,
-                               headers=headers,
+                               headers=base_headers,
                                data=data,
                                params=params,
                                stream=stream,
